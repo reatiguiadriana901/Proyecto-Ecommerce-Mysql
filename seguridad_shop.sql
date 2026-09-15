@@ -1,30 +1,6 @@
 
 
 USE AS_TechShop;
-
-ALTER TABLE Productos ADD COLUMN ubicacion VARCHAR(100) NULL;
-
--- Tabla de auditoría general (acciones importantes sobre la base de datos)
-CREATE TABLE Auditoria (
-    id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
-    usuario VARCHAR(100) NOT NULL,
-    accion VARCHAR(255) NOT NULL,
-    tabla_afectada VARCHAR(100) NULL,
-    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Tabla que guarda el historial de cambios de precio (para el Auditor_Financiero)
-CREATE TABLE Logs_Precios (
-    id_log INT AUTO_INCREMENT PRIMARY KEY,
-    id_producto INT NOT NULL,
-    precio_anterior DECIMAL(10,2) NOT NULL,
-    precio_nuevo DECIMAL(10,2) NOT NULL,
-    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_logprecio_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
-);
-
-
-
 -- 1. ROL: Administrador_Sistema
 
 CREATE ROLE IF NOT EXISTS 'Administrador_Sistema';
