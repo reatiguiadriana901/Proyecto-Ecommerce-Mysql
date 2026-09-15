@@ -54,6 +54,7 @@ CREATE TABLE Productos (
     CONSTRAINT fk_productos_proveedores FOREIGN KEY (id_provider) REFERENCES Proveedores(id_proveedor)
 );
 
+
 CREATE TABLE Ventas (
     id_venta INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
