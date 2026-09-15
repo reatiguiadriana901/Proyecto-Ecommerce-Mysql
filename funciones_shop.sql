@@ -1,193 +1,369 @@
 -- script de funciones hecho por Daniel Florez Lopez
+
+
 USE AS_TechShop;
+
+ALTER TABLE Clientes ADD COLUMN fecha_nacimiento DATE NULL;
+ALTER TABLE Productos ADD COLUMN peso_kg DECIMAL(6,2) NOT NULL DEFAULT 0.50;
+
 DELIMITER //
 
-CREATE FUNCTION IF NOT EXISTS fn_CalcularTotalVenta(var_id_venta INT)
+-- 1. fn_CalcularTotalVenta
+
+DROP FUNCTION IF EXISTS fn_CalcularTotalVenta //
+
+CREATE FUNCTION fn_CalcularTotalVenta(p_id_venta INT)
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE MONTO_TOTAL_VAR DECIMAL(10,2);
-	
-	SELECT SUM(cantidad * precio_unitario_congelado) 
-	INTO MONTO_TOTAL_VAR 
-	FROM Detalle_Ventas 
-	WHERE id_venta = var_id_venta;
-	
-	IF MONTO_TOTAL_VAR IS NULL THEN
-		RETURN 0.00;
-	ELSE
-		RETURN MONTO_TOTAL_VAR;
-	END IF;
+    DECLARE v_monto_total DECIMAL(10,2);
+    DECLARE v_existe_venta INT;
+
+    IF p_id_venta IS NULL OR p_id_venta <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_venta debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_existe_venta FROM Ventas WHERE id_venta = p_id_venta;
+    IF v_existe_venta = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La venta indicada no existe.';
+    END IF;
+
+    SELECT SUM(cantidad * precio_unitario_congelado)
+    INTO v_monto_total
+    FROM Detalle_Ventas
+    WHERE id_venta = p_id_venta;
+
+
+    RETURN IFNULL(v_monto_total, 0.00);
 END //
 
 
 
+-- 2. fn_VerificarDisponibilidadStock
 
-CREATE FUNCTION IF NOT EXISTS fn_VerificarDisponibilidadStock(var_id_producto INT)
-RETURNS INT
+DROP FUNCTION IF EXISTS fn_VerificarDisponibilidadStock //
+
+CREATE FUNCTION fn_VerificarDisponibilidadStock(p_id_producto INT, p_cantidad_requerida INT)
+RETURNS TINYINT(1)
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE var_stock int ;
-	select stock into var_stock from Productos WHERE id_producto  =  var_id_producto;
+    DECLARE v_stock_actual INT;
 
-	IF var_stock IS NULL THEN
-		RETURN 0;
-	ELSE
-		RETURN var_stock;
-	END IF;
+    IF p_id_producto IS NULL OR p_id_producto <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_producto debe ser un número mayor a cero.';
+    END IF;
 
-	
-END // 
+    IF p_cantidad_requerida IS NULL OR p_cantidad_requerida <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La cantidad requerida debe ser mayor a cero.';
+    END IF;
+
+    SELECT stock INTO v_stock_actual FROM Productos WHERE id_producto = p_id_producto;
+
+    IF v_stock_actual IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El producto indicado no existe.';
+    END IF;
+
+    IF v_stock_actual >= p_cantidad_requerida THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END //
 
 
 
-CREATE FUNCTION IF NOT EXISTS fn_ObtenerPrecioProducto(var_id_producto INT)
+-- 3. fn_ObtenerPrecioProducto
+
+DROP FUNCTION IF EXISTS fn_ObtenerPrecioProducto //
+
+CREATE FUNCTION fn_ObtenerPrecioProducto(p_id_producto INT)
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE var_precio DECIMAL(10,2);
-	select precio into var_precio from Productos WHERE id_producto  =  var_id_producto;
+    DECLARE v_precio DECIMAL(10,2);
 
-	IF var_precio IS NULL THEN
-		RETURN 0;
-	ELSE
-		RETURN var_precio;
-	END IF;
-		
-END // 
+    IF p_id_producto IS NULL OR p_id_producto <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_producto debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT precio INTO v_precio FROM Productos WHERE id_producto = p_id_producto;
 
 
-
-
-CREATE FUNCTION IF NOT EXISTS fn_CalcularEdadCliente (var_id_cliente INT)
-RETURNS INT
-DETERMINISTIC
-READS SQL DATA
-BEGIN
-	DECLARE var_fecha DATE ;
-    DECLARE var_edad INT;
-
-    select fecha_registro into var_fecha from Clientes WHERE id_cliente  = var_id_cliente;
-
-   SET var_edad = TIMESTAMPDIFF(YEAR, var_fecha, CURDATE());
-   
-   RETURN var_edad;
-    
+    RETURN v_precio;
 END //
 
 
-CREATE FUNCTION IF NOT EXISTS fn_FormatearNombreCompleto (var_id_cliente INT)
+
+-- 4. fn_CalcularEdadCliente
+
+DROP FUNCTION IF EXISTS fn_CalcularEdadCliente //
+
+CREATE FUNCTION fn_CalcularEdadCliente(p_id_cliente INT)
+RETURNS INT
+NOT DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE v_fecha_nacimiento DATE;
+    DECLARE v_existe_cliente INT;
+
+    IF p_id_cliente IS NULL OR p_id_cliente <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_cliente debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_existe_cliente FROM Clientes WHERE id_cliente = p_id_cliente;
+    IF v_existe_cliente = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El cliente indicado no existe.';
+    END IF;
+
+    SELECT fecha_nacimiento INTO v_fecha_nacimiento FROM Clientes WHERE id_cliente = p_id_cliente;
+
+
+    IF v_fecha_nacimiento IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN TIMESTAMPDIFF(YEAR, v_fecha_nacimiento, CURDATE());
+END //
+
+
+-- 5. fn_FormatearNombreCompleto
+
+DROP FUNCTION IF EXISTS fn_FormatearNombreCompleto //
+
+CREATE FUNCTION fn_FormatearNombreCompleto(p_id_cliente INT)
 RETURNS VARCHAR(200)
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE var_nombre VARCHAR(100);
-    DECLARE var_apellido VARCHAR(100);
-    DECLARE var_estandar VARCHAR(200);
+    DECLARE v_nombre VARCHAR(100);
+    DECLARE v_apellido VARCHAR(100);
+    DECLARE v_existe_cliente INT;
 
-    SELECT TRIM(UPPER(nombre)), 
-		TRIM(UPPER(apellido)) 
-    into var_nombre,var_apellido from Clientes WHERE id_cliente = var_id_cliente;
-    SET var_estandar = CONCAT(IFNULL(var_nombre, 'SIN NOMBRE'), ' ', IFNULL(var_apellido, 'SIN APELLIDO'));  
-    RETURN var_estandar; 
+    IF p_id_cliente IS NULL OR p_id_cliente <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_cliente debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_existe_cliente FROM Clientes WHERE id_cliente = p_id_cliente;
+    IF v_existe_cliente = 0 THEN
+        RETURN NULL;
+    END IF;
+
+    SELECT TRIM(UPPER(nombre)), TRIM(UPPER(apellido))
+    INTO v_nombre, v_apellido
+    FROM Clientes
+    WHERE id_cliente = p_id_cliente;
+
+    RETURN CONCAT(IFNULL(v_nombre, 'SIN NOMBRE'), ' ', IFNULL(v_apellido, 'SIN APELLIDO'));
 END //
 
 
+-- 6. fn_EsClienteNuevo
 
-CREATE FUNCTION IF NOT EXISTS fn_EsClienteNuevo(var_id_cliente INT)
-RETURNS BOOL
+DROP FUNCTION IF EXISTS fn_EsClienteNuevo //
+
+CREATE FUNCTION fn_EsClienteNuevo(p_id_cliente INT)
+RETURNS TINYINT(1)
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE var_fecha_registro_cliente TIMESTAMP;
-    DECLARE var_primera_compra TIMESTAMP;
-    DECLARE var_isnew INT;
+    DECLARE v_fecha_registro TIMESTAMP;
+    DECLARE v_primera_compra TIMESTAMP;
+    DECLARE v_existe_cliente INT;
+    DECLARE v_dias_diferencia INT;
 
-	select c.fecha_registro ,v.fecha_venta  into var_fecha_registro_cliente,var_primera_compra from Clientes c
-	inner join Ventas v on c.id_cliente  = v.id_cliente 
-	where  c.id_cliente = var_id_cliente
-	ORDER BY v.fecha_venta  ASC LIMIT 1;
-	
-	SET var_isnew = TIMESTAMPDIFF(DAY,var_fecha_registro_cliente,var_primera_compra);
-	IF var_isnew <= 30 THEN
-		return TRUE;
-	ELSE 
-		RETURN FALSE;
-	END IF;
+    IF p_id_cliente IS NULL OR p_id_cliente <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_cliente debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_existe_cliente FROM Clientes WHERE id_cliente = p_id_cliente;
+    IF v_existe_cliente = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El cliente indicado no existe.';
+    END IF;
+
+    SELECT c.fecha_registro, v.fecha_venta
+    INTO v_fecha_registro, v_primera_compra
+    FROM Clientes c
+    INNER JOIN Ventas v ON c.id_cliente = v.id_cliente
+    WHERE c.id_cliente = p_id_cliente
+    ORDER BY v.fecha_venta ASC
+    LIMIT 1;
+
+ 
+    IF v_primera_compra IS NULL THEN
+        RETURN FALSE;
+    END IF;
+
+    SET v_dias_diferencia = TIMESTAMPDIFF(DAY, v_fecha_registro, v_primera_compra);
+
+    IF v_dias_diferencia <= 30 THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
 END //
 
 
-CREATE FUNCTION IF NOT EXISTS fn_AplicarDescuento (porcentaje INT,monto DECIMAL(10,2))
+
+-- 7. fn_AplicarDescuento
+
+DROP FUNCTION IF EXISTS fn_AplicarDescuento //
+
+CREATE FUNCTION fn_AplicarDescuento(p_porcentaje INT, p_monto DECIMAL(10,2))
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
-   DECLARE total decimal(10,2);
-   set total =  monto * (1-(porcentaje/100));
-   RETURN total;	
-END // 
+    IF p_porcentaje IS NULL OR p_porcentaje < 0 OR p_porcentaje > 100 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El porcentaje debe estar entre 0 y 100.';
+    END IF;
+
+    IF p_monto IS NULL OR p_monto < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El monto no puede ser negativo.';
+    END IF;
+
+    RETURN ROUND(p_monto * (1 - (p_porcentaje / 100)), 2);
+END //
 
 
-CREATE FUNCTION IF NOT EXISTS fn_ObtenerUltimaFechaCompra(var_id_cliente INT)
+
+-- 8. fn_ObtenerUltimaFechaCompra
+
+DROP FUNCTION IF EXISTS fn_ObtenerUltimaFechaCompra //
+
+CREATE FUNCTION fn_ObtenerUltimaFechaCompra(p_id_cliente INT)
 RETURNS DATE
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	declare ultima_venta DATE ;	
-	select fecha_venta into ultima_venta from Ventas WHERE id_cliente = var_id_cliente  order by fecha_venta desc limit 1;
-    return  ultima_venta;
+    DECLARE v_ultima_venta DATE;
+    DECLARE v_existe_cliente INT;
+
+    IF p_id_cliente IS NULL OR p_id_cliente <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_cliente debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_existe_cliente FROM Clientes WHERE id_cliente = p_id_cliente;
+    IF v_existe_cliente = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El cliente indicado no existe.';
+    END IF;
+
+
+    SELECT fecha_venta INTO v_ultima_venta
+    FROM Ventas
+    WHERE id_cliente = p_id_cliente
+    ORDER BY fecha_venta DESC
+    LIMIT 1;
+
+    RETURN v_ultima_venta;
 END //
 
-CREATE FUNCTION IF NOT EXISTS fn_ValidarFormatoEmail(var_email VARCHAR(255))
+
+
+-- 9. fn_ValidarFormatoEmail
+
+DROP FUNCTION IF EXISTS fn_ValidarFormatoEmail //
+
+CREATE FUNCTION fn_ValidarFormatoEmail(p_email VARCHAR(255))
 RETURNS TINYINT(1)
 DETERMINISTIC
 NO SQL
 BEGIN
-
-    IF var_email IS NOT NULL 
-       AND var_email NOT LIKE '% %' 
-       AND var_email LIKE '_%@_%.__%' THEN
-        RETURN 1;
+    IF p_email IS NOT NULL
+       AND TRIM(p_email) <> ''
+       AND p_email NOT LIKE '% %'
+       AND p_email LIKE '_%@_%.__%' THEN
+        RETURN TRUE;
     ELSE
-        RETURN 0;
+        RETURN FALSE;
     END IF;
 END //
 
 
-CREATE FUNCTION IF NOT EXISTS fn_ObtenerNombreCategoria (var_id_producto INT)
+
+-- 10. fn_ObtenerNombreCategoria
+
+DROP FUNCTION IF EXISTS fn_ObtenerNombreCategoria //
+
+CREATE FUNCTION fn_ObtenerNombreCategoria(p_id_producto INT)
 RETURNS VARCHAR(255)
 DETERMINISTIC
-READS SQL DATA 
+READS SQL DATA
 BEGIN
-	DECLARE var_nombre_categoria varchar(255);
-	SELECT c.nombre into  var_nombre_categoria from  Productos  p
-	INNER JOIN Categorias c on c.id_categoria = p.id_categoria
-	Where p.id_producto = var_id_producto LIMIT 1;
-	
-	
-	  IF var_nombre_categoria IS NULL then
-	  	return null;
-	  else
-	  	return  var_nombre_categoria;
-	  END IF;
+    DECLARE v_nombre_categoria VARCHAR(255);
+
+    IF p_id_producto IS NULL OR p_id_producto <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_producto debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT c.nombre INTO v_nombre_categoria
+    FROM Productos p
+    INNER JOIN Categorias c ON c.id_categoria = p.id_categoria
+    WHERE p.id_producto = p_id_producto
+    LIMIT 1;
+
+
+    RETURN v_nombre_categoria;
 END //
 
+-- 11. fn_ContarVentasCliente
 
-CREATE FUNCTION IF NOT EXISTS fn_ContarVentasCliente (var_id_cliente INT)
+DROP FUNCTION IF EXISTS fn_ContarVentasCliente //
+
+CREATE FUNCTION fn_ContarVentasCliente(p_id_cliente INT)
 RETURNS INT
 DETERMINISTIC
 READS SQL DATA
 BEGIN
-	DECLARE venta_total int ;
-	SELECT COUNT(v.id_venta) INTO venta_total from Ventas v where v.id_cliente = var_id_cliente;
-    
-    IF venta_total IS NULL THEN
-    	RETURN 0;
-    ELSE
-    	RETURN venta_total;
+    DECLARE v_total_ventas INT;
+
+    IF p_id_cliente IS NULL OR p_id_cliente <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_cliente debe ser un número mayor a cero.';
     END IF;
+
+    SELECT COUNT(id_venta) INTO v_total_ventas
+    FROM Ventas
+    WHERE id_cliente = p_id_cliente;
+
+    RETURN v_total_ventas;
+END //
+-- 12. fn_CalcularCostoEnvio
+DROP FUNCTION IF EXISTS fn_CalcularCostoEnvio //
+
+CREATE FUNCTION fn_CalcularCostoEnvio(p_id_venta INT)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE v_peso_total DECIMAL(10,2);
+    DECLARE v_existe_venta INT;
+    DECLARE v_costo_base DECIMAL(10,2) DEFAULT 5000.00;   -- costo fijo de manejo
+    DECLARE v_tarifa_por_kg DECIMAL(10,2) DEFAULT 2000.00; -- costo por cada kg
+
+    IF p_id_venta IS NULL OR p_id_venta <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_venta debe ser un número mayor a cero.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_existe_venta FROM Ventas WHERE id_venta = p_id_venta;
+    IF v_existe_venta = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La venta indicada no existe.';
+    END IF;
+
+    SELECT SUM(p.peso_kg * dv.cantidad)
+    INTO v_peso_total
+    FROM Detalle_Ventas dv
+    INNER JOIN Productos p ON dv.id_producto = p.id_producto
+    WHERE dv.id_venta = p_id_venta;
+
+    -- Si la venta no tiene productos todavía, no hay costo de envío
+    IF v_peso_total IS NULL THEN
+        RETURN 0.00;
+    END IF;
+
+    RETURN ROUND(v_costo_base + (v_peso_total * v_tarifa_por_kg), 2);
 END //
 
 DELIMITER ;
+
+
