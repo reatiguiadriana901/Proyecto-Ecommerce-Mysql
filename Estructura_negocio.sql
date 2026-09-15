@@ -38,6 +38,7 @@ CREATE TABLE Productos (
     precio DECIMAL(10, 2) NOT NULL,
     costo DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
+    ubicacion VARCHAR(100) NOT NULL,
     sku VARCHAR(50) NOT NULL UNIQUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     activo BOOLEAN NOT NULL DEFAULT TRUE,
@@ -74,7 +75,28 @@ CREATE TABLE Detalle_Ventas (
     CONSTRAINT fk_detalle_ventas FOREIGN KEY (id_venta) REFERENCES Ventas(id_venta) ON DELETE CASCADE,
     CONSTRAINT fk_detalle_productos FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
 );
- 
+
+
+
+
+-- Tabla de auditoría general (acciones importantes sobre la base de datos)
+CREATE TABLE Auditoria (
+    id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL,
+    accion VARCHAR(255) NOT NULL,
+    tabla_afectada VARCHAR(100) NULL,
+    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla que guarda el historial de cambios de precio (para el Auditor_Financiero)
+CREATE TABLE Logs_Precios (
+    id_log INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NOT NULL,
+    precio_anterior DECIMAL(10,2) NOT NULL,
+    precio_nuevo DECIMAL(10,2) NOT NULL,
+    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_logprecio_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
+);
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
