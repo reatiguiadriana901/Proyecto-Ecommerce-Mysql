@@ -146,6 +146,16 @@ fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
 );
 
+-- Tabla correspondiente al punto 1 de los Eventos
+
+
+CREATE TABLE reporte_ventas_semanales(
+    id_reporte_semanal INT AUTO_INCREMENT PRIMARY KEY,
+    cantidad INT,
+    total DECIMAL(10,2),
+    fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
