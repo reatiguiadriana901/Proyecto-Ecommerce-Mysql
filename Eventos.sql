@@ -105,14 +105,6 @@ DELIMITER ;
 
 -- 6.Crea una lista de productos que necesitan ser reabastecidos
 
-CREATE TABLE lista_reabastecimiento (
-    id_reabastecimiento INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_producto VARCHAR(150) NOT NULL,
-    stock_actual INT NOT NULL,
-    motivo VARCHAR(100) DEFAULT 'Stock bajo (<=10 unidades)',
-    fecha_generado TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 DELIMITER //
 
 CREATE EVENT evt_generate_reorder_list_daily
