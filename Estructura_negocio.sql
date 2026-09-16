@@ -167,6 +167,18 @@ CREATE TABLE log_cambios_precio_historico (
     fecha_cambio TIMESTAMP
 );
 
+
+-- Tabla correspondiente al punto 4 de los Eventos
+
+CREATE TABLE Promociones (
+    id_promocion INT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(50) NOT NULL UNIQUE,
+    porcentaje_descuento DECIMAL(5,2) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
