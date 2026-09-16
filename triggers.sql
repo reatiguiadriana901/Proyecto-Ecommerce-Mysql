@@ -4,16 +4,6 @@
 
 -- 1. Guarda un log de cambios de precios.
 
-CREATE TABLE log_cambios_precio (
-    id_log INT AUTO_INCREMENT PRIMARY KEY,
-    id_producto INT NOT NULL,
-    precio_anterior DECIMAL(10,2) NOT NULL,
-    precio_nuevo DECIMAL(10,2) NOT NULL,
-    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_log_precio_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
-);
-
 DELIMITER //
 
 CREATE TRIGGER trg_audit_precio_producto_after_update
@@ -21,7 +11,7 @@ AFTER UPDATE ON Productos
 FOR EACH ROW
 BEGIN
     IF NEW.precio <> OLD.precio THEN
-        INSERT INTO log_cambios_precio (id_producto, precio_anterior, precio_nuevo)
+        INSERT INTO Log_Precios (id_producto, precio_anterior, precio_nuevo)
         VALUES (OLD.id_producto, OLD.precio, NEW.precio);
     END IF;
 END //
@@ -92,14 +82,6 @@ DELIMITER;
 
 -- 5. Registra en una tabla de auditoría cada vez que se crea un nuevo cliente
 
-CREATE TABLE auditoria_nuevo_cliente(
-id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
-id_cliente INT NOT NULL,
-nombre VARCHAR(100),
-fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
-);
 
 DELIMITER //
 
