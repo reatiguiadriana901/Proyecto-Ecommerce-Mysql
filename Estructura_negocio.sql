@@ -38,7 +38,7 @@ CREATE TABLE Productos (
     precio DECIMAL(10, 2) NOT NULL,
     costo DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
-    ubicacion VARCHAR(100) NOT NULL,
+    ubicacion VARCHAR(100) ,
     sku VARCHAR(50) NOT NULL UNIQUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     activo BOOLEAN NOT NULL DEFAULT TRUE,
