@@ -27,7 +27,7 @@ CREATE TABLE Clientes (
     email VARCHAR(150) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL,
     ciudad VARCHAR(100) NULL,
-    direccion_completa TEXT NULL,
+    direccion_envio TEXT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
  
