@@ -74,10 +74,11 @@ WITH ComprasPorCliente AS (
 )
 
 SELECT 
-	COUNT(CASE WHEN cantidad_compras > 1 THEN 1 END) AS clientes_fieles,
-	COUNT(*) AS total_clientes_compradores,
-	(COUNT(CASE WHEN cantidad_compras > 1 THEN 1 END) / COUNT(*)) * 100 AS porcentaje_repeticion
-	FROM ComprasPorCliente;
+    
+    SUM(IF(cantidad_compras > 1, 1, 0)) AS clientes_fieles,
+    COUNT(*) AS total_clientes_compradores,
+    (SUM(IF(cantidad_compras > 1, 1, 0)) * 100.0) / COUNT(*) AS porcentaje_repeticion
+FROM ComprasPorCliente;
 
 
 
