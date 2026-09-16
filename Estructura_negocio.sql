@@ -191,6 +191,17 @@ CREATE TABLE lista_reabastecimiento (
 );
 
 
+-- Tabla correspondiente al punto 9 de los Eventos
+
+
+CREATE TABLE resumen_ventas_diarias (
+    id_resumen INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    cantidad_ventas INT,
+    total_vendido DECIMAL(10,2)
+);
+
+
 
 -- ------------------------
 -- INSERCIÓN DE DATOS
