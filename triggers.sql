@@ -125,7 +125,6 @@ CREATE TABLE auditoria_productos (
 );
 	
 
-
 DELIMITER //
 
 CREATE TRIGGER trg_set_fecha_modificacion_producto
@@ -133,7 +132,7 @@ AFTER UPDATE ON Productos
 FOR EACH ROW
 BEGIN
 
-	UPDATE auditoria_productos
+	 auditoria_productos
 	SET fecha_modificacion = Now()
 	WHERE id_producto = NEW.id_producto;
 	
