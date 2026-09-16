@@ -78,7 +78,7 @@ BEGIN
 	
 END //
 
-DELIMITER;
+DELIMITER ;
 
 -- 5. Registra en una tabla de auditoría cada vez que se crea un nuevo cliente
 
@@ -94,12 +94,11 @@ BEGIN
 	
 END //
 
-DELIMITER;
+DELIMITER ;
 
 
 -- 6.Actualiza un campo total_gastado en la tabla clientes después de cada compra
 
-ALTER TABLE Clientes ADD COLUMN total_gastado DECIMAL(10,2) DEFAULT 0;
 
 DELIMITER //
 
@@ -113,7 +112,7 @@ BEGIN
 
 END //
 
-DELIMITER;
+DELIMITER ;
 
 -- 7. Actualiza automáticamente la fecha de última modificación de un producto
 
@@ -135,12 +134,12 @@ FOR EACH ROW
 BEGIN
 
 	UPDATE auditoria_productos
-	SET fecha_modificacion = NEW.fecha_modificacion 
+	SET fecha_modificacion = Now()
 	WHERE id_producto = NEW.id_producto;
 	
 END//
 
-DELIMITER;
+DELIMITER ;
 
 -- 8. Impide que el stock de un producto se actualice a un valor negativo.
 
@@ -158,7 +157,7 @@ BEGIN
 		
 END //
 
-DELIMITER;
+DELIMITER ;
 
 -- 9. Convierte a mayúscula la primera letra del nombre y apellido de un cliente al insertarlo.
 
@@ -171,8 +170,6 @@ BEGIN
 	SET NEW.nombre = CONCAT(UPPER(LEFT(NEW.nombre,1)), LOWER(SUBSTRING(NEW.nombre,2)));
     SET NEW.apellido = CONCAT(UPPER(LEFT(NEW.apellido,1)), LOWER(SUBSTRING(NEW.apellido,2)));
 END //
-END
-
 DELIMITER ;
 
 
@@ -190,12 +187,12 @@ BEGIN
 	SELECT SUM(cantidad * precio_unitario_congelado) 
 	INTO v_total 
 	FROM Detalle_Ventas 
-	WHERE id_venta = NEW.id_venta
+	WHERE id_venta = NEW.id_venta;
 	
 	UPDATE Ventas
     SET  total = v_total
     WHERE id_venta = NEW.id_venta;
 	
-END
+END //
 
 DELIMITER ;
