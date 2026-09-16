@@ -202,6 +202,17 @@ CREATE TABLE resumen_ventas_diarias (
 );
 
 
+-- Tabla correspondiente al punto 10 de los Eventos
+
+
+CREATE TABLE alertas_inconsistencia (
+    id_alerta INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(255) NOT NULL,
+    id_referencia INT,
+    fecha_detectada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 
 -- ------------------------
 -- INSERCIÓN DE DATOS
