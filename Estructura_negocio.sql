@@ -179,6 +179,19 @@ CREATE TABLE Promociones (
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+
+-- Tabla correspondiente al punto 6 de los Eventos
+
+CREATE TABLE lista_reabastecimiento (
+    id_reabastecimiento INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_producto VARCHAR(150) NOT NULL,
+    stock_actual INT NOT NULL,
+    motivo VARCHAR(100) DEFAULT 'Stock bajo (<=10 unidades)',
+    fecha_generado TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
