@@ -124,18 +124,16 @@ CREATE TABLE auditoria_productos (
     CONSTRAINT fk_auditoria_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
 );
 	
-
+-- 7
 DELIMITER //
 
 CREATE TRIGGER trg_set_fecha_modificacion_producto
 AFTER UPDATE ON Productos
 FOR EACH ROW
 BEGIN
-
-	 auditoria_productos
-	SET fecha_modificacion = Now()
-	WHERE id_producto = NEW.id_producto;
-	
+    INSERT INTO auditoria_productos (id_producto, fecha_modificacion)
+    VALUES (NEW.id_producto, NOW())
+    ON DUPLICATE KEY UPDATE fecha_modificacion = NOW();
 END//
 
 DELIMITER ;
