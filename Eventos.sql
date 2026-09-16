@@ -179,13 +179,6 @@ DELIMITER ;
 
 -- 10. Busca inconsistencias en los datos (ej. ventas sin detalles).
 
-CREATE TABLE alertas_inconsistencia (
-    id_alerta INT AUTO_INCREMENT PRIMARY KEY,
-    descripcion VARCHAR(255) NOT NULL,
-    id_referencia INT,
-    fecha_detectada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 DELIMITER //
 
 CREATE EVENT evt_check_data_consistency_nightly
