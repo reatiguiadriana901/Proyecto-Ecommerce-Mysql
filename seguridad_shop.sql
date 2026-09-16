@@ -50,7 +50,6 @@ CREATE ROLE IF NOT EXISTS 'Atencion_Cliente';
 GRANT SELECT ON AS_TechShop.Clientes TO 'Atencion_Cliente';
 GRANT SELECT ON AS_TechShop.Ventas TO 'Atencion_Cliente';
 GRANT SELECT ON AS_TechShop.Detalle_Ventas TO 'Atencion_Cliente';
-GRANT UPDATE (direccion_envio) ON AS_TechShop.Clientes TO 'Atencion_Cliente';
 GRANT UPDATE (estado) ON AS_TechShop.Ventas TO 'Atencion_Cliente';
 
 -- Procedimientos útiles para esta labor
