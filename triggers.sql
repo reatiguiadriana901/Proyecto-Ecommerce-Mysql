@@ -98,6 +98,7 @@ DELIMITER;
 
 
 -- 6.Actualiza un campo total_gastado en la tabla clientes después de cada compra
+
 ALTER TABLE Clientes ADD COLUMN total_gastado DECIMAL(10,2) DEFAULT 0;
 
 DELIMITER //
