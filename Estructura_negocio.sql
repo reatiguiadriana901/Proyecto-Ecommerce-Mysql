@@ -156,6 +156,17 @@ CREATE TABLE reporte_ventas_semanales(
     fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabla correspondiente al punto 3 de los Eventos, tambien se requiere la tabla de funciones Log_Precios
+
+
+CREATE TABLE log_cambios_precio_historico (
+    id_log INT,
+    id_producto INT,
+    precio_anterior DECIMAL(10,2),
+    precio_nuevo DECIMAL(10,2),
+    fecha_cambio TIMESTAMP
+);
+
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
