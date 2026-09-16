@@ -97,6 +97,51 @@ CREATE TABLE Logs_Precios (
     fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_logprecio_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
 );
+-- TABLAS DE APOYO :)
+-- Estas tablas no venían en el diseño original, pero varios
+-- procedimientos las necesitan para poder guardar información
+-- (historial, devoluciones, créditos, notificaciones).
+
+
+CREATE TABLE Historial_Stock (
+    id_historial INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NOT NULL,
+    stock_anterior INT NOT NULL,
+    stock_nuevo INT NOT NULL,
+    motivo VARCHAR(255) NOT NULL,
+    fecha_ajuste TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_historial_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
+);
+
+CREATE TABLE Devoluciones (
+    id_devolucion INT AUTO_INCREMENT PRIMARY KEY,
+    id_venta INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INT NOT NULL,
+    motivo VARCHAR(255) NULL,
+    fecha_devolucion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_devolucion_venta FOREIGN KEY (id_venta) REFERENCES Ventas(id_venta),
+    CONSTRAINT fk_devolucion_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
+);
+
+CREATE TABLE Creditos_Cliente (
+    id_credito INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    monto DECIMAL(10,2) NOT NULL,
+    motivo VARCHAR(255) NULL,
+    usado BOOLEAN NOT NULL DEFAULT FALSE,
+    fecha_credito TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_credito_cliente FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+);
+
+CREATE TABLE Notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_venta INT NOT NULL,
+    mensaje VARCHAR(255) NOT NULL,
+    fecha_notificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_notificacion_venta FOREIGN KEY (id_venta) REFERENCES Ventas(id_venta)
+);
+
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
