@@ -27,7 +27,7 @@ DELIMITER ;
  --   id_cliente INT NULL,
  --   termino_buscado VARCHAR(150),
  --   fecha_busqueda TIMESTAMP DEFAULT CURRENT_TIMESTAMP
---);
+-- );
 
 DELIMITER //
 
