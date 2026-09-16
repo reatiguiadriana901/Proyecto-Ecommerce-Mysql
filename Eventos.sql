@@ -23,12 +23,12 @@ SET GLOBAL event_scheduler = ON;
 
 -- 2. Borra tablas temporales diariamente
 
-CREATE TABLE temp_busquedas (
-    id_busqueda INT AUTO_INCREMENT PRIMARY KEY,
-    id_cliente INT NULL,
-    termino_buscado VARCHAR(150),
-    fecha_busqueda TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+--CREATE TABLE temp_busquedas (
+ --   id_busqueda INT AUTO_INCREMENT PRIMARY KEY,
+ --   id_cliente INT NULL,
+ --   termino_buscado VARCHAR(150),
+ --   fecha_busqueda TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+--);
 
 DELIMITER //
 
@@ -45,23 +45,6 @@ DELIMITER ;
 
 -- 3. Archiva logs de más de 6 meses en tablas históricas
 
-CREATE TABLE log_cambios_precio (
-    id_log INT AUTO_INCREMENT PRIMARY KEY,
-    id_producto INT NOT NULL,
-    precio_anterior DECIMAL(10,2) NOT NULL,
-    precio_nuevo DECIMAL(10,2) NOT NULL,
-    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_log_precio_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
-);
-
-CREATE TABLE log_cambios_precio_historico (
-    id_log INT,
-    id_producto INT,
-    precio_anterior DECIMAL(10,2),
-    precio_nuevo DECIMAL(10,2),
-    fecha_cambio TIMESTAMP
-);
 
 DELIMITER //
 
@@ -71,7 +54,7 @@ STARTS CURRENT_TIMESTAMP
 DO
 BEGIN
     INSERT INTO log_cambios_precio_historico
-    SELECT * FROM log_cambios_precio
+    SELECT * FROM Logs_Precios
     WHERE fecha_cambio < NOW() - INTERVAL 6 MONTH;
 
     DELETE FROM log_cambios_precio
