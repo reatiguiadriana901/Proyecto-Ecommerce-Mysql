@@ -56,7 +56,7 @@ BEGIN
     SELECT * FROM Logs_Precios
     WHERE fecha_cambio < NOW() - INTERVAL 6 MONTH;
 
-    DELETE FROM log_cambios_precio
+    DELETE FROM Logs_Precio
     WHERE fecha_cambio < NOW() - INTERVAL 6 MONTH;
 END //
 
