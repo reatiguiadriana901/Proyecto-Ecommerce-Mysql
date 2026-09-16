@@ -235,7 +235,7 @@ INSERT INTO Proveedores (nombre, email_contacto, telefono_contacto) VALUES
 ('GameZone Supplies', 'ventas@gamezonesupplies.com', '+57 320-4445566');
  
 
-INSERT INTO Clientes (nombre, apellido, email, contrasena, ciudad, direccion_completa, fecha_registro) VALUES
+INSERT INTO Clientes (nombre, apellido, email, contrasena, ciudad, direccion_envio, fecha_registro) VALUES
 ('Adriana', 'Gomez', 'adriana@mail.com', '$2b$12$SecureHashForAdriana', 'Bucaramanga', 'Bucaramanga, Santander', '2026-01-10 14:30:00'),
 ('Sergio', 'Perez', 'sergio@mail.com', '$2b$12$SecureHashForSergio', 'Bogotá', 'Bogotá, Cundinamarca', '2026-01-12 09:15:00'),
 ('Juan', 'Rodriguez', 'juan@mail.com', '$2b$12$HashJuan', 'Medellín', 'Medellín, Antioquia', '2026-01-25 18:20:00'),
