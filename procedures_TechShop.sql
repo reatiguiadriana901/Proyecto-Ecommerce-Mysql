@@ -83,7 +83,7 @@ CREATE PROCEDURE sp_AgregarNuevoProducto(
     IN p_stock INT,
     IN p_sku VARCHAR(50),
     IN p_id_categoria INT,
-    IN p_id_provider INT
+    IN p_id_proveedor INT
 )
 BEGIN
     DECLARE v_existe_categoria INT;
@@ -112,15 +112,15 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La categoría indicada no existe.';
     END IF;
 
-    SELECT COUNT(*) INTO v_existe_proveedor FROM Proveedores WHERE id_proveedor = p_id_provider;
+    SELECT COUNT(*) INTO v_existe_proveedor FROM Proveedores WHERE id_proveedor = p_id_proveedor;
     IF v_existe_proveedor = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El proveedor indicado no existe.';
     END IF;
 
     START TRANSACTION;
 
-    INSERT INTO Productos (nombre, descripcion, precio, costo, stock, sku, id_categoria, id_provider)
-    VALUES (p_nombre, p_descripcion, p_precio, p_costo, p_stock, p_sku, p_id_categoria, p_id_provider);
+    INSERT INTO Productos (nombre, descripcion, precio, costo, stock, sku, id_categoria, id_proveedor)
+    VALUES (p_nombre, p_descripcion, p_precio, p_costo, p_stock, p_sku, p_id_categoria, p_id_proveedor);
 
     COMMIT;
 
