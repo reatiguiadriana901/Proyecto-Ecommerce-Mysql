@@ -19,7 +19,6 @@ END //
 
 DELIMITER ;
 
-SET GLOBAL event_scheduler = ON;
 
 -- 2. Borra tablas temporales diariamente
 
@@ -196,3 +195,7 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- activacion de los eventos
+
+SET GLOBAL event_scheduler = ON;
