@@ -4,13 +4,6 @@
 
 -- 1.  Genera un reporte de ventas semanal
 
-CREATE TABLE reporte_ventas_semanales(
-    id_reporte_semanal INT AUTO_INCREMENT PRIMARY KEY,
-    cantidad INT,
-    total DECIMAL(10,2),
-    fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 DELIMITER //
 
 CREATE EVENT evt_generate_weekly_sales_report
