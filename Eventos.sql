@@ -120,7 +120,7 @@ END //
 
 DELIMITER ;
 
--- 7. 
+-- 7. Reconstruye los índices de las tablas más usadas para optimizar el rendimiento.
 
 DELIMITER //
 
@@ -137,7 +137,7 @@ END //
 
 DELIMITER ;
 
--- 8. 
+-- 8. Desactiva cuentas de clientes sin actividad en más de un año.
 
 ALTER TABLE Clientes ADD COLUMN cuenta_activa BOOLEAN DEFAULT TRUE;
 
@@ -160,14 +160,7 @@ END //
 
 DELIMITER ;
 
--- 9.
-
-CREATE TABLE resumen_ventas_diarias (
-    id_resumen INT AUTO_INCREMENT PRIMARY KEY,
-    fecha DATE NOT NULL,
-    cantidad_ventas INT,
-    total_vendido DECIMAL(10,2)
-);
+-- 9. Agrega los datos de ventas del día en una tabla de resumen para acelerar reportes.
 
 DELIMITER //
 
@@ -184,7 +177,7 @@ END //
 
 DELIMITER ;
 
--- 10.
+-- 10. Busca inconsistencias en los datos (ej. ventas sin detalles).
 
 CREATE TABLE alertas_inconsistencia (
     id_alerta INT AUTO_INCREMENT PRIMARY KEY,
