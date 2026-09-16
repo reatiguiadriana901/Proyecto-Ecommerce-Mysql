@@ -28,7 +28,8 @@ CREATE TABLE Clientes (
     contrasena VARCHAR(255) NOT NULL,
     ciudad VARCHAR(100) NULL,
     direccion_envio TEXT NULL,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_gastado DECIMAL(10,2) DEFAULT 0
 );
  
 CREATE TABLE Productos (
