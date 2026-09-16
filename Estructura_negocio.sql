@@ -135,6 +135,17 @@ CREATE TABLE Notificaciones (
     CONSTRAINT fk_notificacion_venta FOREIGN KEY (id_venta) REFERENCES Ventas(id_venta)
 );
 
+-- Tabla correspondiente al punto 5 de los triggers
+
+CREATE TABLE auditoria_nuevo_cliente(
+id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
+id_cliente INT NOT NULL,
+nombre VARCHAR(100),
+fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_id_cliente FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+);
+
 -- ------------------------
 -- INSERCIÓN DE DATOS
 -- ------------------------
