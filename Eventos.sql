@@ -23,7 +23,7 @@ SET GLOBAL event_scheduler = ON;
 
 -- 2. Borra tablas temporales diariamente
 
---CREATE TABLE temp_busquedas (
+-- CREATE TABLE temp_busquedas (
  --   id_busqueda INT AUTO_INCREMENT PRIMARY KEY,
  --   id_cliente INT NULL,
  --   termino_buscado VARCHAR(150),
