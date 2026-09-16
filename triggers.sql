@@ -11,7 +11,7 @@ AFTER UPDATE ON Productos
 FOR EACH ROW
 BEGIN
     IF NEW.precio <> OLD.precio THEN
-        INSERT INTO Log_Precios (id_producto, precio_anterior, precio_nuevo)
+        INSERT INTO Logs_Precios (id_producto, precio_anterior, precio_nuevo)
         VALUES (OLD.id_producto, OLD.precio, NEW.precio);
     END IF;
 END //
