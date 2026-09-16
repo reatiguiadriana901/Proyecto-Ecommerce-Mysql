@@ -79,14 +79,7 @@ CREATE TABLE Detalle_Ventas (
 
 
 
--- Tabla de auditoría general (acciones importantes sobre la base de datos)
-CREATE TABLE Auditoria (
-    id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
-    usuario VARCHAR(100) NOT NULL,
-    accion VARCHAR(255) NOT NULL,
-    tabla_afectada VARCHAR(100) NULL,
-    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+
 
 -- Tabla que guarda el historial de cambios de precio (para el Auditor_Financiero)
 CREATE TABLE Logs_Precios (
