@@ -117,18 +117,26 @@ DELIMITER;
 
 -- 7. Actualiza automáticamente la fecha de última modificación de un producto
 
-
-ALTER TABLE Productos ADD COLUMN fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE TABLE auditoria_productos (
+    id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NOT NULL,
+    fecha_modificacion DATETIME NOT NULL,
+	
+    CONSTRAINT fk_auditoria_producto FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
+);
+	
 
 
 DELIMITER //
 
 CREATE TRIGGER trg_set_fecha_modificacion_producto
-BEFORE UPDATE ON Productos
+AFTER UPDATE ON Productos
 FOR EACH ROW
 BEGIN
-	
-	SET NEW.fecha_modificacion = NOW();
+
+	UPDATE auditoria_productos
+	SET fecha_modificacion = NEW.fecha_modificacion 
+	WHERE id_producto = NEW.id_producto;
 	
 END//
 
